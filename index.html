@@ -456,7 +456,7 @@
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
 
-      if (sim) drawChart(sim);
+      if (sim) drawChart(sim, false);
       else drawStaticPreview();
     }
 
@@ -638,8 +638,17 @@
       ctx.fill();
     }
 
-    function drawChart(state) {
-      const maxVal = Math.max(10, state.maxVal * 1.15);
+    function drawChart(state, fixedPreviewScale = false) {
+      const previewMax = Math.max(
+        Number(controls.tunaInit.max),
+        Number(controls.sharkInit.max),
+        10
+      );
+
+      const maxVal = fixedPreviewScale
+        ? previewMax
+        : Math.max(10, state.maxVal * 1.15);
+
       const box = drawAxes(maxVal, state.maxTime);
       drawLine(state.tunaPoints, state.timePoints, '#0ea5e9', maxVal, state.maxTime, box);
       drawLine(state.sharkPoints, state.timePoints, '#f43f5e', maxVal, state.maxTime, box);
@@ -651,7 +660,7 @@
       if (!sim || isPaused) return;
 
       stepSimulation(sim);
-      drawChart(sim);
+      drawChart(sim, false);
       updateStats();
 
       if (sim.running) {
@@ -668,7 +677,7 @@
       isPaused = false;
       pauseBtn.textContent = 'Pause';
       sim = createSimulation();
-      drawChart(sim);
+      drawChart(sim, false);
       updateStats();
       setStatus('Running... t = 0.00', '#2563eb');
       animationId = requestAnimationFrame(animate);
@@ -720,7 +729,7 @@
         time: 0
       };
 
-      drawChart(preview);
+      drawChart(preview, true);
     }
 
     Object.values(controls).forEach(control => {
